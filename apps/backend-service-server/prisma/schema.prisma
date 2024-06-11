@@ -1,0 +1,117 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Employees {
+  address           String?
+  appointmentsItems Appointments[]
+  availability      String?
+  avatar            String?
+  createdAt         DateTime       @default(now())
+  email             String?
+  fullName          String?
+  id                String         @id @default(cuid())
+  password          String?
+  phone             String?
+  refreshToken      String?
+  reviewsItems      Reviews[]
+  role              String?
+  store             Stores?        @relation(name: "employeesItems", fields: [storeId], references: [id])
+  storeId           String?
+  storesItems       Stores[]       @relation(name: "EmployeesOnStoresItems")
+  updatedAt         DateTime       @updatedAt
+  username          String?
+}
+
+model Stores {
+  address        String?
+  createdAt      DateTime    @default(now())
+  email          String?
+  employees      Employees?  @relation(name: "EmployeesOnStoresItems", fields: [employeesId], references: [id])
+  employeesId    String?
+  employeesItems Employees[] @relation(name: "employeesItems")
+  id             String      @id @default(cuid())
+  name           String?
+  phone          String?
+  services       Services?   @relation(name: "ServicesOnStoresItems", fields: [servicesId], references: [id])
+  servicesId     String?
+  servicesItems  Services[]  @relation(name: "servicesItems")
+  updatedAt      DateTime    @updatedAt
+}
+
+model Customers {
+  address           String?
+  appointmentsItems Appointments[]
+  avatar            String?
+  createdAt         DateTime       @default(now())
+  email             String?
+  fullName          String?
+  id                String         @id @default(cuid())
+  loyaltyPoints     Int?
+  password          String?
+  phone             String?
+  refreshToken      String?
+  reviewsItems      Reviews[]
+  updatedAt         DateTime       @updatedAt
+  username          String?
+}
+
+model Appointments {
+  appointmentTime Json?
+  createdAt       DateTime   @default(now())
+  customer        Customers? @relation(fields: [customerId], references: [id])
+  customerId      String?
+  employee        Employees? @relation(fields: [employeeId], references: [id])
+  employeeId      String?
+  id              String     @id @default(cuid())
+  paymentsItems   Payments[]
+  service         Services?  @relation(fields: [serviceId], references: [id])
+  serviceId       String?
+  status          String?
+  updatedAt       DateTime   @updatedAt
+}
+
+model Services {
+  appointmentsItems Appointments[]
+  createdAt         DateTime       @default(now())
+  description       String?
+  duration          Int?
+  id                String         @id @default(cuid())
+  price             Float?
+  reviewsItems      Reviews[]
+  serviceName       String?
+  store             Stores?        @relation(name: "servicesItems", fields: [storeId], references: [id])
+  storeId           String?
+  storesItems       Stores[]       @relation(name: "ServicesOnStoresItems")
+  updatedAt         DateTime       @updatedAt
+}
+
+model Payments {
+  amount        Float?
+  appointment   Appointments? @relation(fields: [appointmentId], references: [id])
+  appointmentId String?
+  createdAt     DateTime      @default(now())
+  id            String        @id @default(cuid())
+  paymentDate   DateTime?
+  paymentMethod String?
+  updatedAt     DateTime      @updatedAt
+}
+
+model Reviews {
+  comments   String?
+  createdAt  DateTime   @default(now())
+  customer   Customers? @relation(fields: [customerId], references: [id])
+  customerId String?
+  employee   Employees? @relation(fields: [employeeId], references: [id])
+  employeeId String?
+  id         String     @id @default(cuid())
+  rating     Int?
+  service    Services?  @relation(fields: [serviceId], references: [id])
+  serviceId  String?
+  updatedAt  DateTime   @updatedAt
+}
